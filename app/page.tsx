@@ -9,7 +9,15 @@ import FilterSidebar from '../components/FilterSidebar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Filter, Loader2 } from 'lucide-react';
-import Footer from "../components/footer";
+import Footer from '../components/footer';
+
+// ✅ Add a type for the appliedFilters state
+interface Filters {
+  minPrice?: string;
+  maxPrice?: string;
+  categories?: string[];
+  tags?: string[];
+}
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -17,7 +25,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState({});
+  const [appliedFilters, setAppliedFilters] = useState<Filters>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -28,7 +36,7 @@ export default function Home() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      
+
       if (selectedCategory !== 'all') {
         params.append('category', selectedCategory);
       }
@@ -50,8 +58,8 @@ export default function Home() {
         let data = await response.json();
 
         if (appliedFilters.tags?.length > 0) {
-          data = data.filter(product => 
-            product.tags?.some(tag => appliedFilters.tags.includes(tag))
+          data = data.filter(product =>
+            product.tags?.some(tag => appliedFilters.tags!.includes(tag))
           );
         }
 
@@ -64,14 +72,14 @@ export default function Home() {
     }
   };
 
-  const handleSearch = (term) => {
+  const handleSearch = (term: string) => {
     setSearchTerm(term);
     setTimeout(() => {
       fetchProducts();
     }, 300);
   };
 
-  const handleFilterChange = (filters) => {
+  const handleFilterChange = (filters: Filters) => {
     setAppliedFilters(filters);
   };
 
@@ -81,35 +89,36 @@ export default function Home() {
     <>
       <Head>
         <title>DAB-Technologies - Modern E-commerce Platform</title>
-        <meta name="description" content="Discover amazing products including phones, laptops, cars, and accessories at great prices." />
-        <meta name="keywords" content="e-commerce, phones, laptops, cars, accessories, online shopping" />
+        <meta
+          name="description"
+          content="Discover amazing products including phones, laptops, cars, and accessories at great prices."
+        />
+        <meta
+          name="keywords"
+          content="e-commerce, phones, laptops, cars, accessories, online shopping"
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <Navbar onSearch={handleSearch} searchTerm={searchTerm} />
 
-      <main className="min-h-screen  font-[Lato, sans-serif] text-[#1A1A1A]">
+      <main className="min-h-screen font-[Lato, sans-serif] text-[#1A1A1A]">
         {/* Hero Section */}
         <section
-  className="relative bg-cover bg-center bg-no-repeat py-16 text-white"
-  style={{ backgroundImage: "url('/hero.jpg')" }}
->
-  {/* Optional overlay for readability */}
-  <div className="absolute inset-0 bg-black/40" />
-
-  <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-    <h1 className="text-4xl md:text-6xl font-bold mb-4">
-      Welcome to DAB-Technologies
-    </h1>
-    <p className="text-xl md:text-2xl mb-8 text-white/80">
-      Discover amazing products at unbeatable prices
-    </p>
-    <Button size="lg" className="bg-white text-white hover:bg-[#0E949A] bg-[#0E948A]">
-      Shop Now
-    </Button>
-  </div>
-</section>
-
+          className="relative bg-cover bg-center bg-no-repeat py-16 text-white"
+          style={{ backgroundImage: "url('/hero.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">Welcome to DAB-Technologies</h1>
+            <p className="text-xl md:text-2xl mb-8 text-white/80">
+              Discover amazing products at unbeatable prices
+            </p>
+            <Button size="lg" className="bg-white text-white hover:bg-[#0E949A] bg-[#0E948A]">
+              Shop Now
+            </Button>
+          </div>
+        </section>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Featured Products */}
@@ -120,7 +129,7 @@ export default function Home() {
                 <Badge variant="secondary">Hot</Badge>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {featuredProducts.slice(0, 4).map((product) => (
+                {featuredProducts.slice(0, 4).map(product => (
                   <ProductCard key={product._id} product={product} />
                 ))}
               </div>
@@ -148,7 +157,7 @@ export default function Home() {
                   </Button>
                 </div>
                 <FilterSidebar
-                  onFilterChange={(filters) => {
+                  onFilterChange={filters => {
                     handleFilterChange(filters);
                     setShowFilters(false);
                   }}
@@ -163,11 +172,13 @@ export default function Home() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <h2 className="text-2xl font-bold text-[#1A1A1A]">
-                    {selectedCategory === 'all' ? 'All Products' : `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}`}
+                    {selectedCategory === 'all'
+                      ? 'All Products'
+                      : `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}`}
                   </h2>
                   <Badge variant="outline">{products.length} items</Badge>
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -190,7 +201,7 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product) => (
+                  {products.map(product => (
                     <ProductCard key={product._id} product={product} />
                   ))}
                 </div>
@@ -199,7 +210,8 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <Footer/>
+
+      <Footer />
     </>
   );
 }
