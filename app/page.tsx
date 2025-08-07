@@ -9,9 +9,8 @@ import FilterSidebar from '../components/FilterSidebar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Filter, Loader2 } from 'lucide-react';
-import Footer from '../components/footer';
+import Footer from "../components/footer";
 
-// ✅ Add a type for the appliedFilters state
 interface Filters {
   minPrice?: string;
   maxPrice?: string;
@@ -20,7 +19,7 @@ interface Filters {
 }
 
 export default function Home() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -40,16 +39,20 @@ export default function Home() {
       if (selectedCategory !== 'all') {
         params.append('category', selectedCategory);
       }
+
       if (searchTerm) {
         params.append('search', searchTerm);
       }
+
       if (appliedFilters.minPrice) {
         params.append('minPrice', appliedFilters.minPrice);
       }
+
       if (appliedFilters.maxPrice) {
         params.append('maxPrice', appliedFilters.maxPrice);
       }
-      if (appliedFilters.categories?.length > 0) {
+
+      if (Array.isArray(appliedFilters.categories) && appliedFilters.categories.length > 0) {
         appliedFilters.categories.forEach(cat => params.append('category', cat));
       }
 
@@ -57,9 +60,9 @@ export default function Home() {
       if (response.ok) {
         let data = await response.json();
 
-        if (appliedFilters.tags?.length > 0) {
+        if (Array.isArray(appliedFilters.tags) && appliedFilters.tags.length > 0) {
           data = data.filter(product =>
-            product.tags?.some(tag => appliedFilters.tags!.includes(tag))
+            product.tags?.some((tag: string) => appliedFilters.tags!.includes(tag))
           );
         }
 
@@ -89,14 +92,8 @@ export default function Home() {
     <>
       <Head>
         <title>DAB-Technologies - Modern E-commerce Platform</title>
-        <meta
-          name="description"
-          content="Discover amazing products including phones, laptops, cars, and accessories at great prices."
-        />
-        <meta
-          name="keywords"
-          content="e-commerce, phones, laptops, cars, accessories, online shopping"
-        />
+        <meta name="description" content="Discover amazing products including phones, laptops, cars, and accessories at great prices." />
+        <meta name="keywords" content="e-commerce, phones, laptops, cars, accessories, online shopping" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
@@ -136,7 +133,6 @@ export default function Home() {
             </section>
           )}
 
-          {/* Main Content */}
           <div className="flex gap-8 relative">
             {/* Sidebar for large screens */}
             <aside className="hidden lg:block w-80 flex-shrink-0">
@@ -157,7 +153,7 @@ export default function Home() {
                   </Button>
                 </div>
                 <FilterSidebar
-                  onFilterChange={filters => {
+                  onFilterChange={(filters) => {
                     handleFilterChange(filters);
                     setShowFilters(false);
                   }}
